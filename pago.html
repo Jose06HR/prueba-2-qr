@@ -2,97 +2,103 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Detalles del Pago</title>
+    <title>Lista de Pagos</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
-        .container {
-            max-width: 500px;
-            margin: auto;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #bbb;
+            padding: 10px;
             text-align: center;
         }
-        .dato {
-            font-size: 20px;
-            margin: 10px 0;
+        th {
+            background: #e9e9e9;
         }
-        #qrCode {
-            margin-top: 20px;
+        img {
+            width: 90px;
+        }
+        .btn {
+            padding: 6px 12px;
+            background: #0a84ff;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #006edc;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Detalle del Pago</h2>
+<h2>Lista de Pagos</h2>
+<p>Todos los pagos registrados en Google Sheets.</p>
 
-    <div class="dato"><b>ID:</b> <span id="id"></span></div>
-    <div class="dato"><b>Nombre:</b> <span id="nombre"></span></div>
-    <div class="dato"><b>Fecha:</b> <span id="fecha"></span></div>
-    <div class="dato"><b>Monto:</b> <span id="monto"></span></div>
-    <div class="dato"><b>Estado:</b> <span id="estado"></span></div>
-
-    <h3>Código QR</h3>
-    <img id="qrCode" src="" width="150">
-</div>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Estado</th>
+            <th>QR</th>
+            <th>Ver Detalle</th>
+        </tr>
+    </thead>
+    <tbody id="tablaPagos"></tbody>
+</table>
 
 <script>
-    // ------------------------------------------
-    // OBTENER ID DEL URL
-    // ------------------------------------------
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("id");
-
-    document.getElementById("id").textContent = id ?? "—";
-
-    // ------------------------------------------
-    // URL DEL CSV PUBLICADO (GOOGLE SHEETS)
-    // ------------------------------------------
     const CSV_URL =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vT-grqqDSRtO0OvqY6yxYvtFV3CZ846L-4-P5sSsuWV-zRA3K1kmh24FE256tVdFR-E3TFfczADaoTO/pub?gid=971038428&single=true&output=csv";
 
-    // ------------------------------------------
-    // CARGAR CSV
-    // ------------------------------------------
-    async function cargarDatos() {
+    async function cargarPagos() {
         const resp = await fetch(CSV_URL);
         const texto = await resp.text();
 
-        const lineas = texto.split("\n").map(l => l.trim());
-        const encabezados = lineas[0].split(",");
+        const filas = texto.split("\n").map(f => f.trim());
+        const tbody = document.getElementById("tablaPagos");
 
-        for (let i = 1; i < lineas.length; i++) {
-            const fila = lineas[i].split(",");
+        for (let i = 1; i < filas.length; i++) {
+            const cols = filas[i].split(",");
 
-            if (fila[0] == id) {
-                document.getElementById("nombre").textContent = fila[1];
-                document.getElementById("fecha").textContent = fila[2];
-                document.getElementById("monto").textContent = fila[3];
-                document.getElementById("estado").textContent = fila[4];
-                return;
-            }
+            if (cols.length < 5) continue;
+
+            const id = cols[0];
+            const cliente = cols[1];
+            const fecha = cols[2];
+            const monto = cols[3];
+            const estado = cols[4];
+
+            const urlPago = pago.html?id=${id};
+            const urlQR = https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent("https://jose06hr.github.io/prueba-2-qr/pago.html?id=" + id)};
+
+            const filaHTML = `
+                <tr>
+                    <td>${id}</td>
+                    <td>${cliente}</td>
+                    <td>${fecha}</td>
+                    <td>${monto}</td>
+                    <td>${estado}</td>
+                    <td><img src="${urlQR}" /></td>
+                    <td><a class="btn" href="${urlPago}">Abrir</a></td>
+                </tr>
+            `;
+
+            tbody.innerHTML += filaHTML;
         }
-
-        // Si no se encuentra
-        document.getElementById("nombre").textContent = "No encontrado";
-        document.getElementById("fecha").textContent = "—";
-        document.getElementById("monto").textContent = "—";
-        document.getElementById("estado").textContent = "—";
     }
 
-    cargarDatos();
-
-    // ------------------------------------------
-    // GENERAR QR DINÁMICO
-    // ------------------------------------------
-    if (id) {
-        const qrURL =
-            "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
-            encodeURIComponent("https://jose06hr.github.io/prueba-2-qr/pago.html?id=" + id);
-
-        document.getElementById("qrCode").src = qrURL;
-    }
+    cargarPagos();
 </script>
 
 </body>
