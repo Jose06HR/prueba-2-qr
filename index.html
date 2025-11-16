@@ -1,99 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detalle de Pago</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR de Pago</title>
     <style>
         body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             font-family: Arial, sans-serif;
             background: #f2f2f2;
-            padding: 20px;
-            text-align: center;
         }
-
         .card {
             background: white;
-            padding: 25px;
-            margin: auto;
-            border-radius: 10px;
-            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
         }
-
-        .title {
-            font-size: 22px;
+        img {
+            margin-top: 15px;
+            width: 250px;
+            height: 250px;
+        }
+        h1 {
             margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .error {
-            color: red;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .field {
-            font-size: 18px;
-            margin: 10px 0;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div id="content">
-            <h2 class="title">Cargando información...</h2>
-        </div>
+        <h1>Escanea tu QR</h1>
+        <p>Este código te llevará al registro de pago.</p>
+
+        <!-- QR ESTÁTICO -->
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://jose06hr.github.io/prueba-2-qr/pago.html?id=1" alt="QR">
+
     </div>
-
-    <script>
-        // 1. Obtener ID desde la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get("id");
-
-        const API_URL =
-            "https://script.google.com/macros/s/AKfycbzoMkw-vLBwab3X38Wk4Wm1XuUdMuhx1UanFh3X47ed2RiyAzQRVNuvWICFjXGqwRHofA/exec?id=";
-
-        const contentDiv = document.getElementById("content");
-
-        if (!id) {
-            contentDiv.innerHTML = "<p class='error'>No se proporcionó un ID.</p>";
-        } else {
-            fetch(API_URL + id)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.error) {
-                        contentDiv.innerHTML = <p class='error'>${data.error}</p>;
-                        return;
-                    }
-
-                    // 2. Mostrar los datos recibidos
-                    contentDiv.innerHTML = `
-                        <h2 class="title">Detalle del Pago</h2>
-
-                        <p class="field"><strong>ID:</strong> ${data.id}</p>
-                        <p class="field"><strong>Cliente:</strong> ${data.Cliente}</p>
-                        <p class="field"><strong>Monto:</strong> ${data.Monto}</p>
-                        <p class="field"><strong>Fecha:</strong> ${data.Fecha}</p>
-
-                        <p class="field"><strong>Estado:</strong> 
-                            <span style="color:${data.Estado === 'pagado' ? 'green' : 'orange'};">
-                                ${data.Estado}
-                            </span>
-                        </p>
-
-                        <p class="field"><strong>Referencia:</strong> ${data.Referencia}</p>
-                    `;
-                })
-                .catch(err => {
-                    contentDiv.innerHTML =
-                        "<p class='error'>Error al conectar con el servidor.</p>";
-                    console.error(err);
-                });
-        }
-    </script>
 
 </body>
 </html>
