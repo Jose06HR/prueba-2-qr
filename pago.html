@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Registro de Pago</title>
+<style>
+    body {
+        font-family: Arial;
+        max-width: 450px;
+        margin: 30px auto;
+        padding: 20px;
+        border-radius: 15px;
+        background: #f7f7f7;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .pagado { color: green; font-weight: bold; }
+    .pendiente { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>Registro de Pago</h2>
+<div id="resultado">Cargando...</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+fetch("https://script.google.com/macros/s/AKfycbygmYdcUGZc9sMusa_OprhB2ISUnAHoyzJ8MnZD3oVZ_ShX_Vy04cGaaJgfpZ30143dNg/exec?id=" + id)
+  .then(res => res.json())
+  .then(data => {
+      if (data.error) {
+          document.getElementById("resultado").innerHTML = "<p>ID no encontrado</p>";
+      } else {
+          document.getElementById("resultado").innerHTML = 
+              <p><strong>ID:</strong> ${data.id}</p>
+              <p><strong>Cliente:</strong> ${data.cliente}</p>
+              <p><strong>Monto:</strong> $${data.monto}</p>
+              <p><strong>Fecha:</strong> ${data.fecha}</p>
+              <p><strong>Referencia:</strong> ${data.referencia}</p>
+              <p><strong>Estado:</strong> 
+                <span class="${data.estado === 'Pagado' ? 'pagado' : 'pendiente'}">
+                  ${data.estado}
+                </span>
+              </p>
+          ;
+      }
+  })
+  .catch(err => {
+      document.getElementById("resultado").innerHTML = "<p>Error al cargar datos</p>";
+      console.error(err);
+  });
+</script>
+
+</body>
+</html>
