@@ -1,56 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Registro de Pago</title>
-<style>
-    body {
-        font-family: Arial;
-        max-width: 450px;
-        margin: 30px auto;
-        padding: 20px;
-        border-radius: 15px;
-        background: #f7f7f7;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    .pagado { color: green; font-weight: bold; }
-    .pendiente { color: red; font-weight: bold; }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de Pago</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+        }
+
+        .title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .field {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Registro de Pago</h2>
-<div id="resultado">Cargando...</div>
+    <div class="card">
+        <div id="content">
+            <h2 class="title">Cargando información...</h2>
+        </div>
+    </div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+    <script>
+        // 1. Obtener ID desde la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
 
-fetch("https://script.google.com/macros/s/AKfycbygmYdcUGZc9sMusa_OprhB2ISUnAHoyzJ8MnZD3oVZ_ShX_Vy04cGaaJgfpZ30143dNg/exec?id=" + id)
-  .then(res => res.json())
-  .then(data => {
-      if (data.error) {
-          document.getElementById("resultado").innerHTML = "<p>ID no encontrado</p>";
-      } else {
-          document.getElementById("resultado").innerHTML = 
-              <p><strong>ID:</strong> ${data.id}</p>
-              <p><strong>Cliente:</strong> ${data.cliente}</p>
-              <p><strong>Monto:</strong> $${data.monto}</p>
-              <p><strong>Fecha:</strong> ${data.fecha}</p>
-              <p><strong>Referencia:</strong> ${data.referencia}</p>
-              <p><strong>Estado:</strong> 
-                <span class="${data.estado === 'Pagado' ? 'pagado' : 'pendiente'}">
-                  ${data.estado}
-                </span>
-              </p>
-          ;
-      }
-  })
-  .catch(err => {
-      document.getElementById("resultado").innerHTML = "<p>Error al cargar datos</p>";
-      console.error(err);
-  });
-</script>
+        const API_URL =
+            "https://script.google.com/macros/s/AKfycbzoMkw-vLBwab3X38Wk4Wm1XuUdMuhx1UanFh3X47ed2RiyAzQRVNuvWICFjXGqwRHofA/exec?id=";
+
+        const contentDiv = document.getElementById("content");
+
+        if (!id) {
+            contentDiv.innerHTML = "<p class='error'>No se proporcionó un ID.</p>";
+        } else {
+            fetch(API_URL + id)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        contentDiv.innerHTML = <p class='error'>${data.error}</p>;
+                        return;
+                    }
+
+                    // 2. Mostrar los datos recibidos
+                    contentDiv.innerHTML = `
+                        <h2 class="title">Detalle del Pago</h2>
+
+                        <p class="field"><strong>ID:</strong> ${data.id}</p>
+                        <p class="field"><strong>Cliente:</strong> ${data.Cliente}</p>
+                        <p class="field"><strong>Monto:</strong> ${data.Monto}</p>
+                        <p class="field"><strong>Fecha:</strong> ${data.Fecha}</p>
+
+                        <p class="field"><strong>Estado:</strong> 
+                            <span style="color:${data.Estado === 'pagado' ? 'green' : 'orange'};">
+                                ${data.Estado}
+                            </span>
+                        </p>
+
+                        <p class="field"><strong>Referencia:</strong> ${data.Referencia}</p>
+                    `;
+                })
+                .catch(err => {
+                    contentDiv.innerHTML =
+                        "<p class='error'>Error al conectar con el servidor.</p>";
+                    console.error(err);
+                });
+        }
+    </script>
 
 </body>
 </html>
